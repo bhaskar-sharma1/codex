@@ -1,20 +1,29 @@
-from typing import List
 import time
+from typing import List
 
 class Solution:
     def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
-        nums.sort()
+        nums.sort()  # Sorting is O(n log n)
         res = []
         n = len(nums)
 
         for i in range(n - 3):
-            if i > 0 and nums[i] == nums[i - 1]:
+            if i > 0 and nums[i] == nums[i - 1]:  # Skip duplicates
                 continue
-            for j in range(i + 1, n - 2):
-                if j > i + 1 and nums[j] == nums[j - 1]:
-                    continue
-                left, right = j + 1, n - 1
+            if nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target:  # Pruning
+                break
+            if nums[i] + nums[n - 3] + nums[n - 2] + nums[n - 1] < target:  # Pruning
+                continue
 
+            for j in range(i + 1, n - 2):
+                if j > i + 1 and nums[j] == nums[j - 1]:  # Skip duplicates
+                    continue
+                if nums[i] + nums[j] + nums[j + 1] + nums[j + 2] > target:  # Pruning
+                    break
+                if nums[i] + nums[j] + nums[n - 2] + nums[n - 1] < target:  # Pruning
+                    continue
+
+                left, right = j + 1, n - 1
                 while left < right:
                     total = nums[i] + nums[j] + nums[left] + nums[right]
                     if total == target:
@@ -29,33 +38,32 @@ class Solution:
                         left += 1
                     else:
                         right -= 1
-                        
+
         return res
 
-# 🔹 Function to calculate time complexity analysis
-def calculate_time_complexity(n: int):
-    return f"O(n³) -> Worst case for fourSum with nested loops."
+# Function to measure execution time
+def measure_execution_time(func, *args):
+    start_time = time.time()
+    result = func(*args)
+    execution_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+    return result, execution_time
 
-# 🔹 Testing function with execution time measurement
+# Testing function
 if __name__ == "__main__":
     sol = Solution()
     test_cases = [
-        ([1,0,-1,0,-2,2], 0, [[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]),  
-        ([2,2,2,2,2], 8, [[2,2,2,2]]),  
-        ([1,1,1,1,1], 4, [[1,1,1,1]]),  
-        ([-3,-1,0,2,4,5], 3, [[-3,-1,2,5], [-3,0,2,4]]),  
-        ([0,0,0,0,0,0], 0, [[0,0,0,0]])  
+        ([1, 0, -1, 0, -2, 2], 0, [[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]),
+        ([2, 2, 2, 2, 2], 8, [[2, 2, 2, 2]]),
+        ([1, 1, 1, 1, 1], 4, [[1, 1, 1, 1]]),
+        ([-3, -1, 0, 2, 4, 5], 3, [[-3, -1, 2, 5], [-3, 0, 2, 4]]),
+        ([0, 0, 0, 0, 0, 0], 0, [[0, 0, 0, 0]])
     ]
 
-    print(f"Time Complexity: {calculate_time_complexity(len(test_cases[0][0]))}\n")
-
     for i, (nums, target, expected) in enumerate(test_cases):
-        start_time = time.time()  # Start measuring time
-        result = sol.fourSum(nums, target)
-        execution_time = (time.time() - start_time) * 1000  # Convert to milliseconds
-        
-        result.sort()  # Sort the output for proper comparison
-        expected.sort()  # Sort expected output as well
-        
+        result, execution_time = measure_execution_time(sol.fourSum, nums, target)
+
+        result.sort()  # Sorting for consistent comparison
+        expected.sort()
+
         print(f"Test Case {i + 1}: nums={nums}, target={target} -> {result} {'✅' if result == expected else '❌'}")
         print(f"Execution Time: {execution_time:.4f} ms\n")
